@@ -1,3 +1,97 @@
-<p>
-  detail works!
-</p>
+<div class="flex flex-auto">
+
+  <form
+      class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto"
+      [formGroup]="ticketForm">
+
+      <!-- Header -->
+      <div class="flex items-center -mt-3 -ml-4 bg-gray-50 dark:bg-transparent">         
+          <div class="flex items-center">
+              <!-- More menu -->
+              <button
+                  mat-button
+                  [color]="'warn'"
+                  [matTooltip]="'Delete'"
+                  (click)="deleteTicket()">
+                  Delete
+              </button>
+              <!-- Cancel -->
+              <button
+                  class="ml-auto"
+                  mat-button
+                  [matTooltip]="'Cancel'"
+                  [routerLink]="['../']">
+                  Cancel
+              </button>
+              <!-- Save -->
+              <button
+                  class="ml-2"
+                  mat-flat-button
+                  [color]="'primary'"
+                  [disabled]="ticketForm.invalid"
+                  [matTooltip]="'Save'"
+                  (click)="updateTicket()">
+                  Save
+              </button>
+          </div>
+
+      </div>
+
+      <mat-divider class="mt-6 mb-8"></mat-divider>
+
+      
+      <!-- User -->
+      <div>
+        <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+          <mat-label>Title</mat-label>
+            <mat-select 
+            
+            *ngFor="let user of users"
+            [formControlName]="'userId'"
+            >
+              <mat-option value="select1-1">{{user.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+      </div>
+
+
+      <!-- Title -->
+      <div>
+          <mat-form-field class="fuse-mat-textarea fuse-mat-no-subscript w-full">
+              <mat-label>Title</mat-label>
+              <textarea
+                  matInput
+                  [formControlName]="'title'"
+                  [spellcheck]="false"
+                  matTextareaAutosize
+                  #titleField></textarea>
+          </mat-form-field>
+      </div>
+
+      <!-- Mark as ... button -->
+      <button
+      class="pr-4 pl-3.5"
+      mat-button
+      (click)="toggleCompleted()">
+
+      <!-- Mark as complete -->
+      <ng-container *ngIf="!ticketForm.get('completed').value">
+          <div class="flex items-center justify-center">
+              <mat-icon [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+              <span class="ml-2 font-semibold">MARK AS COMPLETE</span>
+          </div>
+      </ng-container>
+
+      <!-- Mark as incomplete -->
+      <ng-container *ngIf="ticketForm.get('completed').value">
+          <div class="flex items-center justify-center">
+              <mat-icon
+                  class="text-primary"
+                  [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+              <span class="ml-2 font-semibold">MARK AS INCOMPLETE</span>
+          </div>
+      </ng-container>
+  </button>
+  </form>
+
+</div>

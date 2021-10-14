@@ -9,6 +9,7 @@ import { takeUntil } from 'rxjs/operators';
 import { TicketListComponent } from '../list/list.component';
 import { TicketService } from '../ticket.service';
 import { Ticket } from '../types/ticket';
+import { User } from '../types/user';
 
 @Component({
   selector: 'app-detail',
@@ -17,8 +18,10 @@ import { Ticket } from '../types/ticket';
 export class TicketDetailComponent implements OnInit, OnDestroy {
 
   ticket: Ticket;
-  ticketForm: FormGroup;
   tickets: Ticket[];
+
+  users: User[];
+  ticketForm: FormGroup;
   private _unsubscribeAll: Subject<any> = new Subject<any>();
   
   constructor(
@@ -83,9 +86,9 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
    }
 
    /**
-     * Update the contact
+     * Update the ticket
      */
-  updateContractor(): void
+  updateTicket(): void
   {
       // Get the contact object
       this.ticket = Object.assign({}, this.ticketForm.value);
@@ -105,11 +108,14 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
       }
    }
 
+   toggleCompleted() {
+
+   }
    
     /**
      * Delete the contact
      */
-     deleteContractor(): void
+     deleteTicket(): void
      {
          // Open the confirmation dialog
          const confirmation = this._fuseConfirmationService.open({
