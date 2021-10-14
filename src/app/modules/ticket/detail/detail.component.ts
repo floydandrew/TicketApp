@@ -38,6 +38,8 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Open the drawer
+    let ticketId = this._activatedRoute.snapshot.params.id;
+    console.log('The drawer should have opened already');
     this._ticketListComponent.matDrawer.open();
 
     // Create the ticket form
@@ -48,72 +50,95 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
       completed: [false],
   });
 
+  
+  if(ticketId == '0')
+  {
+    this._ticketService.newTicket();
+  }
+  else 
+  {
+    //   this._ticketService.getTicket(ticketId);
+  }
+
+  //Get users list
+  this._ticketService.onUsersChanged
+  .pipe(takeUntil(this._unsubscribeAll))
+  .subscribe((users: User[]) => {
+    this.users = users;
+  });
+
+  // Get tickets list
+  this._ticketService.onTicketsChanged
+  .pipe(takeUntil(this._unsubscribeAll))
+  .subscribe((tickets: Ticket[]) => {
+    this.tickets = tickets;
+  });
+
   // Get the ticket
   this._ticketService.onTicketChanged
   .pipe(takeUntil(this._unsubscribeAll))
   .subscribe((ticket: Ticket) => {
      this._ticketListComponent.matDrawer.open();
-
      this.ticket = ticket;
      this.ticketForm.patchValue(ticket, {emitEvent: false});
   });
-
 
   }
 
     /**
      * On destroy
      */
-     ngOnDestroy(): void
-     {
-         // Unsubscribe from all subscriptions
-         this._unsubscribeAll.next();
-         this._unsubscribeAll.complete();
-  
-         this.closeDrawer();
-     }
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next();
+        this._unsubscribeAll.complete();
 
-       // -----------------------------------------------------------------------------------------------------
-   // @ Public methods
-   // -----------------------------------------------------------------------------------------------------
+        this.closeDrawer();
+    }
 
-   /**
-    * Close the drawer
-    */
-   closeDrawer(): Promise<MatDrawerToggleResult>
-   {
-       return this._ticketListComponent.matDrawer.close();
-   }
+// -----------------------------------------------------------------------------------------------------
+// @ Public methods
+// -----------------------------------------------------------------------------------------------------
 
-   /**
-     * Update the ticket
-     */
-  updateTicket(): void
-  {
-      // Get the contact object
-      this.ticket = Object.assign({}, this.ticketForm.value);
+/**
+* Close the drawer
+*/
+closeDrawer(): Promise<MatDrawerToggleResult>
+{
+    return this._ticketListComponent.matDrawer.close();
+}
 
-      // Update the contact on the server
-      if(this.ticket.id == 0)
-      {
-          this._ticketService.create(this.ticket);
-          this._ticketService.getTicket(this.ticket);
-          this._ticketService.getTickets();
-      }
-      else 
-      {
-          this._ticketService.update(this.ticket);
-          this._ticketService.getTickets();
+/**
+ * Update the ticket
+ */
+updateTicket(): void
+{
+    // Get the contact object
+    this.ticket = Object.assign({}, this.ticketForm.value);
 
-      }
-   }
+    // Update the contact on the server
+    if(this.ticket.id == 0)
+    {
+        this._ticketService.create(this.ticket);
+        // this._ticketService.getTicket(this.ticket);
+        this._ticketService.getTickets();
+    }
+    else 
+    {
+        this._ticketService.update(this.ticket);
+        this._ticketService.getTickets();
 
-   toggleCompleted() {
+    }
+}
 
-   }
+
+toggleCompleted() {
+
+}
    
     /**
-     * Delete the contact
+     * Delete the ticket
      */
      deleteTicket(): void
      {
@@ -135,8 +160,9 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
              if ( result === 'confirmed' )
              {
                  // Get the current contact's id
-                 const id = this.ticket.id;
-                 this._ticketService.delete(this.ticket);
+                 this.tickets.splice(this.ticket.index,1);
+                 this._ticketService.delete(this.tickets);
+                 this.closeDrawer();
  
     
              }

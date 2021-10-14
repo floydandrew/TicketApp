@@ -45,7 +45,7 @@
                   </div>
               </div>
 
-              <!-- Tasks list -->
+              <!-- Tickets list -->
               <ng-container *ngIf="tickets && tickets.length > 0; else noTasks">
                   <div
                       class="divide-y"
@@ -53,8 +53,8 @@
                       [cdkDropListData]="tasks"
                       (cdkDropListDropped)="dropped($event)">
 
-                      <!-- Task -->
-                      <ng-container *ngFor="let ticket of tickets; let first = first; trackBy: trackByFn">
+                      <!-- Tickets -->
+                      <ng-container *ngFor="let ticket of tickets; let i = index">
                           <div>
 
                               <!-- Drag preview -->
@@ -69,15 +69,6 @@
                                   <ng-container *ngIf="selectedTicket && selectedTicket.id === ticket.id">
                                       <div class="z-10 absolute -top-px right-0 -bottom-px flex flex-0 w-1 bg-primary"></div>
                                   </ng-container>
-
-                                  <!-- Drag handle -->
-                                  <div
-                                      class="md:hidden absolute flex items-center justify-center inset-y-0 left-0 w-8 cursor-move md:group-hover:flex"
-                                      cdkDragHandle>
-                                      <mat-icon
-                                          class="icon-size-5 text-hint"
-                                          [svgIcon]="'heroicons_solid:menu'"></mat-icon>
-                                  </div>
 
                                   <!-- Complete ticket button -->
                                   <button
@@ -99,7 +90,7 @@
                                   <!-- Ticket link -->
                                   <a
                                       class="flex flex-auto items-center min-w-0 h-full pr-7"
-                                      [routerLink]="[ticket.id]">
+                                      (click)="selectTicket(i, ticket)">
                                       <!-- Title & Placeholder -->
                                       <div class="flex-auto mr-2 truncate">
                                           <ng-container *ngIf="ticket.title">

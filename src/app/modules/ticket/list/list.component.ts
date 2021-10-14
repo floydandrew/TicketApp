@@ -33,15 +33,18 @@ export class TicketListComponent implements OnInit, OnDestroy {
   ) { this._unsubscribe = new Subject(); }
 
   ngOnInit() {
+    this._ticketService.getUsers();
     this._ticketService.getTickets();
+    // this._ticketService.getUsers();
 
-
-    this._ticketService.onTicketschanged
+    this._ticketService.onTicketsChanged
     .pipe(takeUntil(this._unsubscribe))
     .subscribe(result => {
       this.tickets = result;
       this.ticketsCount = result.length;
-    })
+    });
+
+
 
     // Subscribe to search input field value changes
     this.searchInputControl.valueChanges
@@ -110,6 +113,21 @@ export class TicketListComponent implements OnInit, OnDestroy {
         this._router.navigate(['./', 0], {relativeTo: this._activatedRoute});
 
   }
+
+  /**
+   * Create ticket
+   */
+   selectTicket(index: number, ticket: Ticket): void
+   {
+       // Select ticket
+       // Open to edit ticket entry
+       console.log("The index is " + index + " and the ticket is " + ticket);
+       ticket.index = index;
+
+        this._ticketService.setTicket(ticket);
+        this._router.navigate(['./', ticket.id], {relativeTo: this._activatedRoute});
+ 
+   }
 
   /**
      * Toggle the completed status
