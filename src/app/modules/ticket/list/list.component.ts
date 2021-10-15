@@ -111,7 +111,6 @@ export class TicketListComponent implements OnInit, OnDestroy {
       // Create ticket
       // Open form for new ticket entry
         let newId = this._ticketService.newId;
-        console.log("What happens here exactly");
         this._router.navigate(['./', newId], {relativeTo: this._activatedRoute});
 
   }

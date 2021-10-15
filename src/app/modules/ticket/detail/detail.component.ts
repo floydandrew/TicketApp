@@ -11,6 +11,7 @@ import { TicketService } from '../ticket.service';
 import { Ticket } from '../types/ticket';
 import { User } from '../types/user';
 
+
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -30,7 +31,6 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
     private _activatedRoute: ActivatedRoute,
     private _formBuilder: FormBuilder,
     private _fuseConfirmationService: FuseConfirmationService,
-    private _renderer2: Renderer2,
     private _router: Router,
     private _ticketListComponent: TicketListComponent,
     private _ticketService: TicketService,
@@ -43,14 +43,14 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
     let ticketId = this._activatedRoute.snapshot.params.id;
     this.nextId = parseInt(this._ticketService.newId);
     this._ticketListComponent.matDrawer.open();
-    console.log("The drawer should be open already");
 
     // Create the ticket form
     this.ticketForm = this._formBuilder.group({
-      index    : [''],
       userId   : [''],
       id       : [''],
-      title    : [''],  
+      title    : [''], 
+      index    : [''],
+      user : [''],
       completed: [false],
     });
 
@@ -120,23 +120,27 @@ closeDrawer(): Promise<MatDrawerToggleResult>
  */
 updateTicket(): void
 {
-    // Get the contact object
+    // Get the ticket object
     this.ticket = Object.assign({}, this.ticketForm.value);
-    let newId = this._ticketService.newId;
-    // Update the contact on the server
+    let newId = this._ticketService.newId
+    ;
+    // Update the ticket on the localStorage
     if(this.ticket.id == this.nextId)
     {
+        this.ticket.user = this.users.find((u) => u.id === this.ticket.userId)
+        this.tickets = this._ticketService.storedTickets;
         this.tickets.push(this.ticket);
         this.nextId += 1;
         this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
         this._ticketService.getTickets();
         this._router.navigate(['../'], {relativeTo: this._activatedRoute});
         this.closeDrawer();
-        // this._ticketService.newId((newId + 1);
     }
     else 
     {
+        this.tickets = this._ticketService.storedTickets;
         this.tickets.splice(this.ticket.index,1, this.ticket);
+
         this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
         this._ticketService.getTickets();
         
@@ -171,8 +175,8 @@ toggleCompleted() {
       if ( result === 'confirmed' )
       {
           // Get the current contact's id
-          let removeTicket = this._ticketService.storedTickets;
-          this.tickets = removeTicket.filter((t) => t.id != this.ticket.id );
+          let actionTickets = this._ticketService.storedTickets;
+          this.tickets = actionTickets.filter((t) => t.id != this.ticket.id );
           this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
           this._router.navigate(['../'], {relativeTo: this._activatedRoute});
           this.closeDrawer();

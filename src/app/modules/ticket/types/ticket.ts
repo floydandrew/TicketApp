@@ -1,4 +1,5 @@
-import { User } from "app/core/user/user.types";
+import { User } from "./user";
+
 
 export interface Ticket {
     userId: number;
