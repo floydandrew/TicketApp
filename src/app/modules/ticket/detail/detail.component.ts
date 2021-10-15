@@ -43,6 +43,7 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
     let ticketId = this._activatedRoute.snapshot.params.id;
     this.nextId = parseInt(this._ticketService.newId);
     this._ticketListComponent.matDrawer.open();
+    console.log("The drawer should be open already");
 
     // Create the ticket form
     this.ticketForm = this._formBuilder.group({
@@ -51,7 +52,7 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
       id       : [''],
       title    : [''],  
       completed: [false],
-  });
+    });
 
   
   if(ticketId == this.nextId)
@@ -129,6 +130,8 @@ updateTicket(): void
         this.nextId += 1;
         this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
         this._ticketService.getTickets();
+        this._router.navigate(['../'], {relativeTo: this._activatedRoute});
+        this.closeDrawer();
         // this._ticketService.newId((newId + 1);
     }
     else 
@@ -136,7 +139,7 @@ updateTicket(): void
         this.tickets.splice(this.ticket.index,1, this.ticket);
         this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
         this._ticketService.getTickets();
-
+        
     }
 }
 
@@ -145,37 +148,35 @@ toggleCompleted() {
 
 }
    
-    /**
-     * Delete the ticket
-     */
-     deleteTicket(): void
-     {
-         // Open the confirmation dialog
-         const confirmation = this._fuseConfirmationService.open({
-             title  : 'Delete ticket',
-             message: 'Are you sure you want to delete this ticket? This action cannot be undone!',
-             actions: {
-                 confirm: {
-                     label: 'Delete'
-                 }
-             }
-         });
- 
-         // Subscribe to the confirmation dialog closed action
-         confirmation.afterClosed().subscribe((result) => {
- 
-             // If the confirm button pressed...
-             if ( result === 'confirmed' )
-             {
-                 // Get the current contact's id
-                 this.tickets.splice(this.ticket.index,1);
-                 this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
-                 this.closeDrawer();
- 
-    
-             }
-         });
- 
-     }
+/**
+ * Delete the ticket
+ **/
+  deleteTicket(): void
+  {
+  // Open the confirmation dialog
+  const confirmation = this._fuseConfirmationService.open({
+      title  : 'Delete ticket',
+      message: 'Are you sure you want to delete this ticket? This action cannot be undone!',
+      actions: {
+          confirm: {
+              label: 'Delete'
+          }
+      }
+  });
+
+  // Subscribe to the confirmation dialog closed action
+  confirmation.afterClosed().subscribe((result) => {
+
+      // If the confirm button pressed...
+      if ( result === 'confirmed' )
+      {
+          // Get the current contact's id
+          this.tickets.splice(this.ticket.index,1);
+          this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
+          this._router.navigate(['../'], {relativeTo: this._activatedRoute});
+          this.closeDrawer();
+      }
+  });
+  }
 
 }

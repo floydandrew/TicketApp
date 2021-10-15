@@ -111,6 +111,7 @@ export class TicketListComponent implements OnInit, OnDestroy {
       // Create ticket
       // Open form for new ticket entry
         let newId = this._ticketService.newId;
+        console.log("What happens here exactly");
         this._router.navigate(['./', newId], {relativeTo: this._activatedRoute});
 
   }
@@ -120,12 +121,11 @@ export class TicketListComponent implements OnInit, OnDestroy {
    */
    selectTicket(index: number, ticket: Ticket): void
    {
-       // Select ticket
-       // Open to edit ticket entry
+      // Select ticket
+      // Open to edit ticket entry
       ticket.index = index;
 
       this._ticketService.setTicket(ticket);
-      console.log(ticket.index);
       this._router.navigate(['./', ticket.id], {relativeTo: this._activatedRoute});
  
    }
