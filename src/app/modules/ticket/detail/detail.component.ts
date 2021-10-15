@@ -19,6 +19,8 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
 
   ticket: Ticket;
   tickets: Ticket[];
+  nextId: number;
+  stats: [];
 
   users: User[];
   ticketForm: FormGroup;
@@ -39,25 +41,22 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // Open the drawer
     let ticketId = this._activatedRoute.snapshot.params.id;
-    console.log('The drawer should have opened already');
+    this.nextId = parseInt(this._ticketService.newId);
     this._ticketListComponent.matDrawer.open();
 
     // Create the ticket form
     this.ticketForm = this._formBuilder.group({
+      index    : [''],
       userId   : [''],
       id       : [''],
-      title    : [''],
+      title    : [''],  
       completed: [false],
   });
 
   
-  if(ticketId == '0')
+  if(ticketId == this.nextId)
   {
     this._ticketService.newTicket();
-  }
-  else 
-  {
-    //   this._ticketService.getTicket(ticketId);
   }
 
   //Get users list
@@ -74,6 +73,13 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
     this.tickets = tickets;
   });
 
+  // Get stats
+  this._ticketService.onStatsChanged
+  .pipe(takeUntil(this._unsubscribeAll))
+  .subscribe((stats: []) => {
+     this.stats = stats;
+  });
+
   // Get the ticket
   this._ticketService.onTicketChanged
   .pipe(takeUntil(this._unsubscribeAll))
@@ -82,7 +88,6 @@ export class TicketDetailComponent implements OnInit, OnDestroy {
      this.ticket = ticket;
      this.ticketForm.patchValue(ticket, {emitEvent: false});
   });
-
   }
 
     /**
@@ -116,17 +121,20 @@ updateTicket(): void
 {
     // Get the contact object
     this.ticket = Object.assign({}, this.ticketForm.value);
-
+    let newId = this._ticketService.newId;
     // Update the contact on the server
-    if(this.ticket.id == 0)
+    if(this.ticket.id == this.nextId)
     {
-        this._ticketService.create(this.ticket);
-        // this._ticketService.getTicket(this.ticket);
+        this.tickets.push(this.ticket);
+        this.nextId += 1;
+        this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
         this._ticketService.getTickets();
+        // this._ticketService.newId((newId + 1);
     }
     else 
     {
-        this._ticketService.update(this.ticket);
+        this.tickets.splice(this.ticket.index,1, this.ticket);
+        this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
         this._ticketService.getTickets();
 
     }
@@ -161,7 +169,7 @@ toggleCompleted() {
              {
                  // Get the current contact's id
                  this.tickets.splice(this.ticket.index,1);
-                 this._ticketService.delete(this.tickets);
+                 this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
                  this.closeDrawer();
  
     

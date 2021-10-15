@@ -1,6 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { user } from 'app/mock-api/common/user/data';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -16,52 +15,33 @@ baseUrl = environment.apiUrl;
 ticket: Ticket;
 users: User[];
 
-nextId : BehaviorSubject<any>;
+
 onTicketsChanged: BehaviorSubject<any>;
 onTicketChanged: BehaviorSubject<any>;
-
 onUsersChanged: BehaviorSubject<any>;
+onNewIdChanged: BehaviorSubject<any>;
+onStatsChanged: BehaviorSubject<any>;
 
 constructor(private _httpClient: HttpClient) { 
   this.onTicketsChanged = new BehaviorSubject({});
   this.onTicketChanged = new BehaviorSubject({});
   this.onUsersChanged = new BehaviorSubject({});
+  this.onNewIdChanged = new BehaviorSubject({});
+  this.onStatsChanged = new BehaviorSubject({});
 }
 
-/**
-     * Setter & getter for access localStorage
-     */
- set storedTickets(tickets: Ticket[])
- {
-     localStorage.setItem('tickets', JSON.stringify(tickets));
- }
-
- get storedTickets(): Ticket[]
- {
-     if(localStorage.getItem('tickets')){
-       return JSON.parse(localStorage.getItem('tickets'))
-     }
-     return []
- }
 
 getTickets() {
-  if(this.storedTickets.length == 0) {
+  if(this.storedTickets.length == 0) 
+  {
     this._httpClient.get<Ticket[]>(this.baseUrl + 'todos')
     .subscribe((result: Ticket[]) => {
-    const randomTen = this.shuffle(result).slice(0,10).map(
-      (t) => {
-        return {...t,user: this.users.find((u)=> u.id === t.userId)}
-      }
-    );
-    this.storedTickets = randomTen;
-    this.onTicketsChanged.next(randomTen);
-  })
+      const randomTen = this.randomTen(result); 
+      this.updateAll(randomTen, result.length + 1, ['2', '3', '5']); })
   } 
   else
   {
-    
-    const storedTickets = this.storedTickets;
-    this.onTicketsChanged.next(storedTickets);
+    this.updateAll(this.storedTickets, parseInt(this.newId), this.stats);
   }
 
 }
@@ -77,6 +57,7 @@ getUsers() {
 
 setTicket(ticket: Ticket) {
   this.onTicketChanged.next(ticket);
+  console.log('Index in set ticket' + ticket.index)
 }
 
 
@@ -103,7 +84,7 @@ setTicket(ticket: Ticket) {
 
  newTicket() {
    this.ticket = {
-     id: 0,
+     id: parseInt(this.newId),
      userId: 0,
      title: '',
      completed: false,
@@ -114,21 +95,17 @@ setTicket(ticket: Ticket) {
    this.onTicketChanged.next(this.ticket);
  }
 
- create(ticket: Ticket) {
-   
- }
 
- update(ticket: Ticket) {
 
- }
-
- delete(tickets: Ticket[]) {
+ update(tickets: Ticket[]) {
    this.onTicketsChanged.next(tickets);
-   localStorage.clear;
+   localStorage.removeItem('tickets');
    this.storedTickets = tickets;
-   
  }
  
+
+//  Helper methods
+
  shuffle(array) {
    let currentIndex = array.length, randomIndex;
    
@@ -143,5 +120,79 @@ setTicket(ticket: Ticket) {
    return array;
  }
 
+ randomTen(tickets: Ticket[]) : Ticket[]
+ {
+    return this.shuffle(tickets).slice(0,10).map(
+    (t) => {
+      return {...t,user: this.users.find((u)=> u.id === t.userId)}
+    }
+  );
+ }
+
+ updateAll(tickets: Ticket[], id: number, stats: any) {
+    this.onTicketsChanged.next(tickets);
+    this.onNewIdChanged.next(id);
+    this.onStatsChanged.next(stats);
+
+    if(this.storedTickets.length == 0) {
+      this.updateStorage(tickets, id, stats);
+      // this.storedTickets = tickets;
+      // this.newId = id.toString();
+      // this.stats = stats;
+    }  
+    else 
+    {
+      localStorage.removeItem('tickets');
+      localStorage.removeItem('stats')
+      localStorage.removeItem('nextId');
+      this.updateStorage(tickets, id, stats);
+    }
+ }
+
+ updateStorage(tickets, id, stats)
+ {
+  this.storedTickets = tickets;
+  this.newId = id.toString();
+  this.stats = stats;
+ }
+
+ /**
+     * Setter & getter for access localStorage
+     */
+  set storedTickets(tickets: Ticket[])
+  {
+      localStorage.setItem('tickets', JSON.stringify(tickets));
+  }
+ 
+  get storedTickets(): Ticket[]
+  {
+      if(localStorage.getItem('tickets')){
+        return JSON.parse(localStorage.getItem('tickets'))
+      }
+      return []
+  }
+ 
+  set newId(id)
+  {
+    localStorage.setItem('nextId', id);
+  }
+ 
+  get newId()
+  {
+    return localStorage.getItem('nextId');
+  }
+ 
+  set stats(stats)
+  {
+    localStorage.setItem('stats', JSON.stringify(stats));
+  }
+ 
+  get stats()
+  {
+    if(localStorage.getItem('stats')) {
+      return JSON.parse(localStorage.getItem('stats'))
+    }
+    return []
+  }
 
 }
