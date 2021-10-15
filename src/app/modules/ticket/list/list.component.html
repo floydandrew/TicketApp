@@ -18,50 +18,55 @@
       <mat-drawer-content class="flex flex-col">
 
           <!-- Main -->
-          <div class="flex flex-col flex-auto">
+          <div class="flex-auto">
 
               <!-- Header -->
-              <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between py-8 px-6 md:px-8">
-                  <!-- Title -->
-                  <div>
-                      <div class="text-4xl font-extrabold tracking-tight leading-none">Tickets</div>
-                      <div class="ml-0.5 font-medium text-secondary">
-                          <!-- <span *ngIf="ticketsCount.incomplete === 0">All tasks completed!</span>
-                          <span *ngIf="tasksCount.incomplete !== 0">{{tasksCount.incomplete}} remaining tasks</span> -->
-                      </div>
-                  </div>
-                  <!-- Actions -->
-                  <div class="mt-4 sm:mt-0">
-                      <!-- Add ticket button -->
-                      <button
-                          class="ml-3"
-                          mat-flat-button
-                          [color]="'primary'"
-                          (click)="createTicket()"
-                          [matTooltip]="'Shortcut: Ctrl + /'">
-                          <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                          <span class="ml-2 mr-1">Add Ticket</span>
-                      </button>
-                  </div>
-              </div>
+              <div class="flex flex-col sm:flex-row md:flex-col flex-auto justify-between bg-card py-8 px-6 md:px-8 border-b">
+  
+                <!-- Title -->
+                <div>
+                    <div class="text-4xl font-extrabold tracking-tight leading-none">Tickets</div>
+                </div>
+
+                <!-- Main actions -->
+                <div class="flex items-center mt-4 sm:mt-0 md:mt-4">
+                    <!-- Search -->
+                    <div class="flex-auto">
+                        <mat-form-field class="fuse-mat-dense fuse-mat-no-subscript fuse-mat-rounded w-full min-w-50">
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:search'"></mat-icon>
+                            <input
+                                matInput
+                                [formControl]="searchInputControl"
+                                [autocomplete]="'off'"
+                                [placeholder]="'Search contract'">
+                        </mat-form-field>
+                    </div>
+                    <!-- Add contract button -->
+                    <button
+                        class="ml-4"
+                        mat-flat-button
+                        [color]="'primary'"
+                        (click)="createTicket()">
+                        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                        <span class="ml-2 mr-1">Add</span>
+                    </button>
+                </div>
+            </div>
 
               <!-- Tickets list -->
-              <ng-container *ngIf="tickets && tickets.length > 0; else noTasks">
-                  <div
+              <ng-container *ngIf="tickets && tickets.length > 0">
+                  <ul
                       class="divide-y"
                       cdkDropList
                       [cdkDropListData]="tasks"
                       (cdkDropListDropped)="dropped($event)">
 
                       <!-- Tickets -->
-                      <ng-container *ngFor="let ticket of tickets; let i = index">
+                      <li class="cursor-pointer hover:bg-accent-50" *ngFor="let ticket of tickets; let i = index">
                           <div>
-
-                              <!-- Drag preview -->
-                              <div
-                                  class="flex flex-0 w-0 h-0"
-                                  *cdkDragPreview></div>
-
                               <!-- Task content -->
                               <div class="relative flex items-center h-full pl-10">
 
@@ -92,9 +97,12 @@
                                       class="flex flex-auto items-center min-w-0 h-full pr-7"
                                       (click)="selectTicket(i, ticket)">
                                       <!-- Title & Placeholder -->
-                                      <div class="flex-auto mr-2 truncate">
+                                      <div class="flex-auto space-x-4">
                                           <ng-container *ngIf="ticket.title">
-                                              <span>{{ticket.title}}</span>
+                                              <span class="w-12">{{ticket.id + '     '}}</span> 
+                                              <span class="font-bold w-11">{{'(' + ticket.user.name + ')'}}</span> 
+                                              <span>{{ticket.title + ' '}}</span>
+                                              <span>{{'Completed: ' + ticket.completed}}</span>
                                           </ng-container>
                                           <ng-container *ngIf="!ticket.title">
                                               <span class="select-none text-hint">{{ticket.title | titlecase}} title</span>
@@ -103,8 +111,8 @@
                                   </a>
                               </div>
                           </div>
-                      </ng-container>
-                  </div>
+                      </li>
+                  </ul>
 
               </ng-container>
 

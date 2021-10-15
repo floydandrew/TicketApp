@@ -4,39 +4,8 @@
       class="flex flex-col flex-auto p-6 pt-10 sm:p-8 sm:pt-10 overflow-y-auto"
       [formGroup]="ticketForm">
 
-      <!-- Header -->
-      <div class="flex items-center -mt-3 -ml-4 bg-gray-50 dark:bg-transparent">         
-          <div class="flex items-center">
-              <!-- More menu -->
-              <button
-                  mat-button
-                  [color]="'warn'"
-                  [matTooltip]="'Delete'"
-                  (click)="deleteTicket()">
-                  Delete
-              </button>
-              <!-- Cancel -->
-              <button
-                  class="ml-auto"
-                  mat-button
-                  [matTooltip]="'Cancel'"
-                  [routerLink]="['../']">
-                  Cancel
-              </button>
-              <!-- Save -->
-              <button
-                  class="ml-2"
-                  mat-flat-button
-                  [color]="'primary'"
-                  [disabled]="ticketForm.invalid"
-                  [matTooltip]="'Save'"
-                  (click)="updateTicket()">
-                  Save
-              </button>
-          </div>
-
-      </div>
-
+   
+      <div class="text-4xl font-extrabold tracking-tight leading-none">Edit</div>  
       <mat-divider class="mt-6 mb-8"></mat-divider>
    
       <!-- User -->
@@ -88,6 +57,37 @@
           </div>
       </ng-container>
   </button>
+
+  <!-- Actions -->
+  <div class="flex items-center mt-10 -mx-6 sm:-mx-12 py-4 pr-4 pl-1 sm:pr-12 sm:pl-7 border-t bg-gray-50 dark:bg-transparent">
+    <!-- Delete -->
+    <button
+        mat-button
+        [color]="'warn'"
+        [matTooltip]="'Delete'"
+        (click)="deleteTicket()">
+        Delete
+    </button>
+    <!-- Cancel -->
+    <button
+        class="ml-auto"
+        mat-button
+        [matTooltip]="'Close'"
+        [routerLink]="['../']">
+        Close
+    </button>
+    <!-- Save -->
+    <button
+        class="ml-2"
+        mat-flat-button
+        [color]="'primary'"
+        [disabled]="ticketForm.invalid"
+        [matTooltip]="'Save'"
+        (click)="updateTicket()">
+        Save
+    </button>
+</div>
+
   </form>
 
 </div>

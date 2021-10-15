@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'environments/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
 import { Ticket } from './types/ticket';
 import { User } from './types/user';
 
@@ -12,6 +12,7 @@ import { User } from './types/user';
 export class TicketService {
 baseUrl = environment.apiUrl;
 
+tickets: Ticket[];
 ticket: Ticket;
 users: User[];
 
@@ -68,18 +69,19 @@ setTicket(ticket: Ticket) {
      */
 
 // I have to change this code to just filter the list
- searchContacts(query: string): Observable<Ticket[]>
+ searchTickets(query: string): Observable<Ticket[]>
  {
+    this.tickets = this.storedTickets;
+    let listLength = this.tickets.length;
 
-  let params = new HttpParams();
-        params = params.append('name', query);
-        
-    return this._httpClient.get<Ticket[]>(this.baseUrl, {params})
-    .pipe(
-        tap((contractors) => {
-            this.onTicketsChanged.next(contractors);
-        })
-    );
+    for (var i = 0; i < listLength; i++){
+        this.tickets[i].index = i;
+    }
+
+    let filteredTickets = this.tickets.filter(ticket => ticket.title.includes(query));
+    this.onTicketsChanged.next(filteredTickets);
+    // this.onTicketsChanged.next()
+    return this.onTicketsChanged;
  }
 
  newTicket() {

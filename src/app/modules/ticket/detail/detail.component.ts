@@ -171,7 +171,8 @@ toggleCompleted() {
       if ( result === 'confirmed' )
       {
           // Get the current contact's id
-          this.tickets.splice(this.ticket.index,1);
+          let removeTicket = this._ticketService.storedTickets;
+          this.tickets = removeTicket.filter((t) => t.id != this.ticket.id );
           this._ticketService.updateAll(this.tickets, this.nextId, this.stats);
           this._router.navigate(['../'], {relativeTo: this._activatedRoute});
           this.closeDrawer();

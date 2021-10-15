@@ -53,7 +53,7 @@ export class TicketListComponent implements OnInit, OnDestroy {
         switchMap(query =>
 
             // Search
-            this._ticketService.searchContacts(query)
+            this._ticketService.searchTickets(query)
         )
     )
     .subscribe();
